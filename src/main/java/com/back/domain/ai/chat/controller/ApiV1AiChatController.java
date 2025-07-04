@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/ai/chat")
@@ -26,15 +27,28 @@ public class ApiV1AiChatController {
     private final ChatClient chatClient;
     private final ChatMemory chatMemory;
 
+    private final ChatClient dbChatClient;
+    private final ChatMemory dbChatMemory;
+
+
     @GetMapping("/write")
-    public String write(String msg) {
+    public String write(String msg,String memory) {
         String conversationId = "default";
-        List<Message> memories = chatMemory.get(conversationId);
-        String response = chatClient.prompt().messages(memories).user(msg).call().content();
-        if (response == null || response.isEmpty()) {
-            return "죄송합니다. 응답을 생성할 수 없습니다.";
+        if (Objects.equals(memory, "db")) {
+            List<Message> memories = dbChatMemory.get(conversationId);
+            String response = dbChatClient.prompt().messages(memories).user(msg).call().content();
+            if (response == null || response.isEmpty()) {
+                return "죄송합니다. 응답을 생성할 수 없습니다.";
+            }
+            return response;
+        }else{
+            List<Message> memories = chatMemory.get(conversationId);
+            String response = chatClient.prompt().messages(memories).user(msg).call().content();
+            if (response == null || response.isEmpty()) {
+                return "죄송합니다. 응답을 생성할 수 없습니다.";
+            }
+            return response;
         }
-        return response;
     }
 
     @GetMapping("/write2")
