@@ -1,5 +1,6 @@
 package com.back;
 
+import com.back.domain.ai.chat.tools.DateTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -16,6 +17,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 public class ChatMemoryConfig {
+
+    @Autowired
+    private DateTools dateTools;
 
     @Bean
     public ChatMemoryRepository chatMemoryRepository() {

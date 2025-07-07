@@ -1,5 +1,7 @@
 package com.back;
 
+import com.back.domain.ai.schedules.entities.Schedule;
+import com.back.domain.ai.schedules.services.ScheduleService;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +39,8 @@ public class ChatMemoryTests {
     @Autowired
     JdbcChatMemoryRepository jdbcChatMemoryRepository;
 
+    @Autowired
+    ScheduleService scheduleService;
 
     @Test
     @Order(1)
@@ -144,5 +150,48 @@ public class ChatMemoryTests {
         );
     }
 
+    @Test
+    @Order(7)
+    void testProxiedTools() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/v1/ai/chat/write")
+                        .param("msg", "안녕? 지금 몇시인지 알아?")
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                result ->
+                        assertThat(result.getResponse().getContentAsString())
+                                .contains("%d".formatted(LocalDate.now().getYear()))
+        );
+    }
+    @Test
+    @Order(8)
+    void testProxiedToolsWithJpa() throws Exception {
+        scheduleService.deleteAllSchedules();
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/v1/ai/chat/schedules")
+                        .param("msg", "안녕? 내일 오후 1시에 티타임 약속 추가해줄래?")
+        ).andExpect(
+                status().isOk()
+        ).andDo(
+                result -> {
+                    String response = result.getResponse().getContentAsString();
+                    System.out.println(response);
+                }
+        ).andExpect(result->{
+            assertThat(scheduleService.countSchedules()).isGreaterThan(0);;
+        });
+        Schedule schedule = scheduleService.getFirstSchedule();
+        assertThat(
+                schedule.startAt.getDayOfMonth()).isEqualTo(
+                OffsetDateTime.now().plusDays(1).getDayOfMonth()
+        );
+        assertThat(
+                schedule.startAt.getHour()).isEqualTo(
+                13-9
+        );
+    }
 }
 
