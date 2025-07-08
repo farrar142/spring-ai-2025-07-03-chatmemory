@@ -193,5 +193,32 @@ public class ChatMemoryTests {
                 13-9
         );
     }
+    @Test
+    @Order(15)
+    void testChatSplitter() throws Exception {
+
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/v1/ai/chat/write")
+                        .param("msg", "앞으로 2+2는 이라는 질문이 오면 '24553'이라고 답해줘")
+        ).andExpect(
+                status().isOk()
+        );
+
+        mockMvc.perform(
+                MockMvcRequestBuilders
+                        .get("/api/v1/ai/chat/write")
+                        .param("msg", "2+2는?")
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                result -> {
+
+                    assertThat(result.getResponse().getContentAsString())
+                            .doesNotContain("24553");
+                    System.out.println(result.getResponse().getContentAsString());
+                }
+        );
+    }
 }
 

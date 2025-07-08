@@ -31,6 +31,8 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory")
     implementation("org.springframework.ai:spring-ai-starter-model-chat-memory-repository-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+//    implementation("org.springframework.ai:spring-ai-mcp-server-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
     implementation("com.mysql:mysql-connector-j")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")

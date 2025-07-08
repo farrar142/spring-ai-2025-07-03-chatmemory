@@ -17,6 +17,12 @@ spring:
           jdbc:
             initialize-schema: embedded
             platform: mariadb
+    mcp:
+      server:
+        name: date-time-server
+        version: 1.0.0.0
+        instructions: "None instructions"
+        type: SYNC
   datasource:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
